@@ -1,0 +1,8 @@
+openai
+torch
+torchvision
+torchaudio
+openai-whisper
+transformers
+sentencepiece
+sacremoses
