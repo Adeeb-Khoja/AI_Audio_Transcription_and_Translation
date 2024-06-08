@@ -7,3 +7,6 @@ transformers
 sentencepiece
 sacremoses
 pydub
+moviepy
+gradio
+detoxify

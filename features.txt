@@ -1,0 +1,6 @@
+- generate backgroud music
+- transcript
+- subtitles
+- translation
+- voice over
+- video content generation
