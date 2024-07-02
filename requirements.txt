@@ -10,3 +10,7 @@ pydub
 moviepy
 gradio
 detoxify
+ffmpeg-python
+opencv-python
+pysrt
+python-dotenv
