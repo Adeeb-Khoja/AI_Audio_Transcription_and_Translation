@@ -67,11 +67,12 @@ class ShortsGenerator(object):
         os.makedirs(output_dir, exist_ok=True)
 
         # Process each scene
+        counter = 1
         for scene in scenes:
             start_time = scene['start']
             end_time = scene['end']
             description = scene['description']
-            output_filename = os.path.join(output_dir, f"{description}.mp4")
+            output_filename = os.path.join(output_dir, f"{counter}.mp4")
             shorts_files_path_list.append(output_filename)
             
             # ffmpeg command to extract scene
@@ -89,6 +90,7 @@ class ShortsGenerator(object):
             ]
             
             subprocess.run(cmd, capture_output=True)
+            counter += 1
         
         return shorts_files_path_list
    

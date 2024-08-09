@@ -1,0 +1,24 @@
+- Tab 1 (Transcript):
+Input: Video
+Output: - Transcript
+        - Detected Language
+        - List of Segments
+
+Tab 2 (Translation):
+Input:  - Target Translation Language
+        - Transcript Language
+        - Transcript
+Output: - Translation Transcript
+        - Translation Segments
+
+Tab 3 (SRT):
+Input:  - Language Segments
+Output: - SRT File
+
+Tab 4 (Toxicitiy Analysis):
+Input: - Transcript
+Output: - Toxicity Report
+
+Tab 5 (Shorts):
+Input: Video
+Output: Shorts

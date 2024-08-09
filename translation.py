@@ -1,36 +1,36 @@
 from transformers import MarianMTModel, MarianTokenizer
+import torch
 
 class TranslationModel(object):
-    def __init__(self):
-        pass
+    def __init__(self, src_lang, tgt_lang, use_gpu=True):
+        model_name = f'Helsinki-NLP/opus-mt-{src_lang}-{tgt_lang}'
+        self.model = MarianMTModel.from_pretrained(model_name)
+        self.tokenizer = MarianTokenizer.from_pretrained(model_name)
+        self.device = torch.device('cuda' if use_gpu and torch.cuda.is_available() else 'cpu')
+        self.model.to(self.device)
 
-    def translate_chunk(self,chunk, src_lang, tgt_lang):
-        try:
+    def translate_chunks(self, chunks):
+        # Tokenize all chunks together
+        inputs = self.tokenizer(chunks, return_tensors="pt", padding=True, truncation=True, max_length=512).to(self.device)
+        
+        # Generate translations for all chunks in one call
+        translated_tokens = self.model.generate(**inputs)
+        
+        # Decode translated tokens
+        translated_texts = [self.tokenizer.decode(tokens, skip_special_tokens=True) for tokens in translated_tokens]
+        
+        return translated_texts
 
-            model_name = f'Helsinki-NLP/opus-mt-{src_lang}-{tgt_lang}'
-            model = MarianMTModel.from_pretrained(model_name)
-            tokenizer = MarianTokenizer.from_pretrained(model_name)
-            
-            inputs = tokenizer(chunk, return_tensors="pt", padding=True, truncation=True, max_length=512)
-            translated_tokens = model.generate(**inputs)
-            translated_text = tokenizer.decode(translated_tokens[0], skip_special_tokens=True)
-            
-            return translated_text
-
-        except Exception as e:
-            print(e)
-            raise Exception(f"Error translating text {e}")
-
-    def translate_text(self,text, src_lang, tgt_lang):
+    def translate_text(self, text):
         max_length = 512
         chunks = self.split_text(text, max_length)
-        translated_chunks = [self.translate_chunk(chunk, src_lang, tgt_lang) for chunk in chunks]
+        
+        # Translate chunks in batches
+        translated_chunks = self.translate_chunks(chunks)
+        
         return ' '.join(translated_chunks)
 
-
-
-    def split_text(self,text, max_length):
-        # Split text into sentences
+    def split_text(self, text, max_length):
         sentences = text.split('. ')
         chunks = []
         current_chunk = ""

@@ -22,7 +22,7 @@ class SRTGenerator(object):
         return f"{td},{ms:03d}"
     @classmethod
     def generate_srt(cls,subtitles, output_file):
-        with open(output_file, 'w') as f:
+        with open(output_file, 'w',encoding='utf-8') as f:
             for sub in subtitles:
                 start_time = cls.format_time(sub['start'])
                 end_time = cls.format_time(sub['end'])
