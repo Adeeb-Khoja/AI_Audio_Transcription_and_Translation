@@ -28,7 +28,7 @@ class ShortsGenerator(object):
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a helpful videos editing assistant."},
-                {"role": "user", "content": "Identify the important scenes from the following subtitles text return that by start times and end time,videos should be at less 30s and maximum 2 min with format like this \"1. Arrival of Raymond Reddington at the FBI office - Start time: 00:00:39, End time: 00:01:17\":\n" + text}
+                {"role": "user", "content": "Identify the important scenes from the following subtitles text return that by start times and end time,videos should be at less 30s and maximum 2 min, return only 3 vidoes with format like this \"1. Arrival of Raymond Reddington at the FBI office - Start time: 00:00:39, End time: 00:01:17\":\n" + text}
             ],
             max_tokens=1500
         )
@@ -91,6 +91,8 @@ class ShortsGenerator(object):
             
             subprocess.run(cmd, capture_output=True)
             counter += 1
+
+        print(f'Generated all Scenes with file names {shorts_files_path_list}')
         
         return shorts_files_path_list
    
