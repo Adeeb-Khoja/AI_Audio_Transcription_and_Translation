@@ -14,3 +14,4 @@ ffmpeg-python
 opencv-python
 pysrt
 python-dotenv
+boto3

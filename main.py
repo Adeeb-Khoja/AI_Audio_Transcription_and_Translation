@@ -1,6 +1,7 @@
 
 
 import json
+from aws_uploader import HelperS3
 from extract_audio import VideoHelper
 from helpers.srt_generator import SRTGenerator
 from moderator import DetoxifyModerator
@@ -11,7 +12,8 @@ from translation import *
 import gradio as gr
 from dotenv import load_dotenv
 import ast
-
+import os
+from datetime import datetime 
 
 def translate_segments(segments,translator: TranslationModel):
     transalted_segments = []
@@ -24,8 +26,14 @@ def translate_segments(segments,translator: TranslationModel):
 
 
 def tab1_transcript(file,  progress=gr.Progress()):
+    # Upload file to S3 first
+    print('Upload file to S3 first')
+    progress(0.0, desc="Uploading to S3...")
+    HelperS3.folder_name = datetime.now().strftime("%m-%d-%Y,%H:%M:%S") + "/"
+    HelperS3.aws_upload_file(file,HelperS3.bucket_name, os.path.basename(file))
+
     #Extracting the audio from video
-    progress(0, desc="Extracting Audio From Video...")
+    progress(0.1, desc="Extracting Audio From Video...")
     video_file_path = file
     audio_file_path = 'extracted_audio.mp3'
     video_helper = VideoHelper()
@@ -120,6 +128,15 @@ def tab5_shorts(original_srt_file, video_file, progress = gr.Progress()):
     print('Generating Scenes Done!!!')
 
     return_shorts_list = shorts_path_list + [""] * (3 - len(shorts_path_list))
+    print(f'Returned Shorts list to Gradio... {return_shorts_list}')
+
+    progress(0.9, desc="Uploading Shorts to S3..")
+    short_count = 1
+    for short in shorts_path_list:
+        print(f"Uploading short {short} to S3")
+        HelperS3.aws_upload_file(short,os.getenv('AWS_BUCKET_NAME'),f"short_{short_count}.mp4")
+        short_count += 1
+        
     return return_shorts_list[0], return_shorts_list[1], return_shorts_list[2]
 
 

@@ -12,10 +12,12 @@ import subprocess
 class ShortsGenerator(object):
 
     def read_srt(self,file_path):
+        print('Reading Srt file... @ShortsGenerator')
         subtitles = pysrt.open(file_path)
         return subtitles
 
     def extract_text(self,subtitles):
+        print('extract text... @ShortsGenerator')
         text = ''
         for subtitle in subtitles:
             text += subtitle.text + ' '
@@ -23,17 +25,19 @@ class ShortsGenerator(object):
 
     def get_important_scenes(self,text):
         # Load OpenAI API key
+        print('Sending promot to Chatgpt... @ShortsGenerator')
         client = OpenAI(api_key=os.getenv('OPEN_AI_API_KEY'))
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a helpful videos editing assistant."},
-                {"role": "user", "content": "Identify the important scenes from the following subtitles text return that by start times and end time,videos should be at less 30s and maximum 2 min, return only 3 vidoes with format like this \"1. Arrival of Raymond Reddington at the FBI office - Start time: 00:00:39, End time: 00:01:17\":\n" + text}
+                {"role": "user", "content": "Identify the important scenes from the following subtitles text return that by start times and end time,videos should be at less 30s and maximum 2 min, return minimum 1 and maximum 3 vidoes with format like this \"1. Arrival of Raymond Reddington at the FBI office - Start time: 00:00:39, End time: 00:01:17\":\n" + text}
             ],
             max_tokens=1500
         )
         # print(f" this out put : {response.choices[0].message.content}")
         important_scenes = response.choices[0].message
+        print(f'Important Scenes from ChatGPT... @ShortsGenerator  {important_scenes}')
         return important_scenes
 
     def execute(self,srt_file_path):
@@ -57,7 +61,7 @@ class ShortsGenerator(object):
 
 
     def extract_video_scenes(self,video_file, scenes):
-
+        print('Extracting Scenes... @ShortsGenerator')
         shorts_files_path_list = []
 
         # Output directory
@@ -72,6 +76,7 @@ class ShortsGenerator(object):
             start_time = scene['start']
             end_time = scene['end']
             description = scene['description']
+            print('Generating {description}... @ShortsGenerator')
             output_filename = os.path.join(output_dir, f"{counter}.mp4")
             shorts_files_path_list.append(output_filename)
             
@@ -89,6 +94,7 @@ class ShortsGenerator(object):
                 '-y'  # Overwrite output file if exists
             ]
             
+            print('Running CMD FFMPEG {description}... @ShortsGenerator')
             subprocess.run(cmd, capture_output=True)
             counter += 1
 
